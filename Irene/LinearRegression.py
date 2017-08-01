@@ -1,3 +1,5 @@
+# data from http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html#linear-regression-example
+# 
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
@@ -12,20 +14,20 @@ class LinearRegression(object):
 
     def train(self, X, y):
 
-        # y =Wx+b
+        # y = Wx+b
         self.X = X
         self.y = np.expand_dims(y, axis=1)
         self.W = np.ones((np.shape(self.X)[1], np.shape(self.X)[1]))
         self.b = np.ones(shape=(1,1))
 
-
+        # initial prediction
         self.predict = np.matmul(self.W, np.transpose(self.X)) + self.b
 
         print('Started training...')
 
-        #error: euclidean distance
+        # mean square error
         self.error = np.sum(np.square(np.subtract(self.y, np.transpose(self.predict))))/(2*len(self.X))
-        # SGD
+        # use SGD to minimize the error
         self._SGD()
         print('Finished training...')
 
@@ -36,14 +38,13 @@ class LinearRegression(object):
         #run SGD to find optimum params
 
 
-
+        # threshold set to be 0.001
         while (self.error > 0.001):
-        # for i in range(len(self.X)):
-            # print ('---',self.error)
+            # randomly sample a data record to update
             i = np.random.randint(0, len(self.X))
-
             temp = np.sum(np.subtract(self.y, np.transpose(self.predict)))/len(self.X)
-            # update gradient
+            
+            # update W
             self.WG = temp * self.X[i]
             self.W += learning_rate1 * self.WG
 
@@ -55,7 +56,7 @@ class LinearRegression(object):
             tempPredict = np.matmul(self.W, np.transpose(self.X)) + self.b
             tempError = np.sum(np.subtract(self.y, np.transpose(tempPredict))) / (2 * len(self.X))
 
-            print ('---', self.W,self.b,tempError)
+            #print ('---', self.W,self.b,tempError)
             self.error = tempError
 
 
@@ -64,7 +65,8 @@ class LinearRegression(object):
 
 
     def test(self, X,y):
-        # apply the model, show the error
+        
+        # apply the model, show the parameters and error
         predict = np.matmul(self.W, np.transpose(X)) + self.b
         error = np.linalg.norm(y - np.transpose(predict))
 
@@ -98,16 +100,14 @@ def loadData(fileName=None):
 if __name__=='__main__':
 
 
-
-
     # loading data
     diabetes_X_train, diabetes_X_test, diabetes_y_train, diabetes_y_test = loadData(None)
     lrm = LinearRegression()
-
+    
+    # training
     lrm.train(diabetes_X_train, diabetes_y_train)
 
-    #base:2548.07
-    #base: [ 938.23786125] 152.918861826
+    # getting prediction
     predicts = lrm.test(diabetes_X_test, diabetes_y_test)
     #lrm.predict(diabetes_X_test)
 
